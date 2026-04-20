@@ -8,17 +8,18 @@ use Typesense\Client;
 use Typesense\Exceptions\TypesenseClientError;
 use Typesense\Health;
 
-function mockTypesenseClient(mixed $healthReturn = null, ?Throwable $healthThrow = null): Client
+function mockTypesenseClient(?Closure $healthReturn = null, ?Throwable $healthThrow = null): Client
 {
+    /** @var Health&\Mockery\MockInterface $health */
     $health = Mockery::mock(Health::class);
-
-    if ($healthThrow !== null) {
+    
+    if ($healthThrow) {
         $health->shouldReceive('retrieve')->andThrow($healthThrow);
     } else {
-        $health->shouldReceive('retrieve')->andReturnUsing($healthReturn ?? fn () => ['ok' => true]);
+        $health->shouldReceive('retrieve')->andReturnUsing($healthReturn ?? fn (): array => ['ok' => true]);
     }
 
-    /** @var Client $client */
+    /** @var Client&\Mockery\MockInterface $client */
     $client = Mockery::mock(Client::class);
     $client->health = $health;
 
@@ -151,3 +152,30 @@ it('creates a client from settings when no client is injected', function () {
 
     expect($result->status)->toEqual(Status::failed());
 });
+
+it('can connect to a real typesense instance', function () {
+    $host = env('TYPESENSE_HOST');
+    $port = env('TYPESENSE_PORT');
+    $protocol = env('TYPESENSE_PROTOCOL', 'http');
+    $apiKey = env('TYPESENSE_API_KEY');
+
+    if (! $host || ! $port || ! $apiKey) {
+        $this->markTestSkipped('Typesense environment variables not set.');
+    }
+
+    $result = TypesenseCheck::new()
+        ->clientSettings([
+            'api_key' => $apiKey,
+            'nodes' => [
+                [
+                    'host' => $host,
+                    'port' => (string) $port,
+                    'protocol' => $protocol,
+                ],
+            ],
+            'connection_timeout_seconds' => 2,
+        ])
+        ->run();
+
+    expect($result->status)->toEqual(Status::ok());
+})->group('integration');

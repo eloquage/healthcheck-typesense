@@ -1,16 +1,6 @@
 parameters:
-    level: 9
+    level: max
     paths:
         - src
         - tests
     tmpDir: build/phpstan
-    ignoreErrors:
-        -
-            identifier: method.notFound
-            path: tests/ArchTest.php
-        -
-            identifier: method.notFound
-            path: tests/TypesenseCheckTest.php
-        -
-            identifier: assign.propertyType
-            path: tests/TypesenseCheckTest.php
