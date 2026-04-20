@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use IllumaLaw\HealthCheckTypesense\TypesenseCheck;
+use Mockery\MockInterface;
 use Spatie\Health\Enums\Status;
 use Typesense\Client;
 use Typesense\Exceptions\TypesenseClientError;
@@ -10,16 +11,16 @@ use Typesense\Health;
 
 function mockTypesenseClient(?Closure $healthReturn = null, ?Throwable $healthThrow = null): Client
 {
-    /** @var Health&\Mockery\MockInterface $health */
+    /** @var Health&MockInterface $health */
     $health = Mockery::mock(Health::class);
-    
+
     if ($healthThrow) {
         $health->shouldReceive('retrieve')->andThrow($healthThrow);
     } else {
         $health->shouldReceive('retrieve')->andReturnUsing($healthReturn ?? fn (): array => ['ok' => true]);
     }
 
-    /** @var Client&\Mockery\MockInterface $client */
+    /** @var Client&MockInterface $client */
     $client = Mockery::mock(Client::class);
     $client->health = $health;
 
