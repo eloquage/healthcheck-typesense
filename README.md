@@ -1,32 +1,28 @@
-# Health Check Typesense
+# Healthcheck Typesense
 
-[![Tests](https://github.com/illuma-law/healthcheck-typesense/actions/workflows/run-tests.yml/badge.svg)](https://github.com/illuma-law/healthcheck-typesense/actions)
-[![Packagist License](https://img.shields.io/badge/Licence-MIT-blue)](http://choosealicense.com/licenses/mit/)
-[![Latest Stable Version](https://img.shields.io/packagist/v/illuma-law/healthcheck-typesense?label=Version)](https://packagist.org/packages/illuma-law/healthcheck-typesense)
+[![Tests](https://github.com/illuma-law/healthcheck-typesense/actions/workflows/run-tests.yml/badge.svg)](https://github.com/illuma-law/healthcheck-typesense/actions/workflows/run-tests.yml)
+[![PHPStan](https://github.com/illuma-law/healthcheck-typesense/actions/workflows/phpstan.yml/badge.svg)](https://github.com/illuma-law/healthcheck-typesense/actions/workflows/phpstan.yml)
+[![Latest Stable Version](https://img.shields.io/packagist/v/illuma-law/healthcheck-typesense)](https://packagist.org/packages/illuma-law/healthcheck-typesense)
+[![License](https://img.shields.io/packagist/l/illuma-law/healthcheck-typesense)](LICENSE.md)
 
-**Focused Typesense health check for Spatie's Laravel Health package**
+A [Typesense](https://typesense.org) health check for [Spatie's Laravel Health](https://spatie.be/docs/laravel-health) package.
 
-This package provides a robust health check for Typesense, monitoring connection health, collection counts, and total document counts.
+The check pings your Typesense cluster's `/health` endpoint. If the request succeeds within the configured timeout, the check passes. If it exceeds the threshold, it warns. If the cluster is unreachable, it fails.
 
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Usage](#usage)
-  - [Registration](#registration)
-  - [Fluent API](#fluent-api)
-- [Testing](#testing)
-- [Changelog](#changelog)
-- [Credits](#credits)
-- [License](#license)
+## Requirements
+
+- PHP 8.3+
+- Laravel 11, 12, or 13
+- [spatie/laravel-health](https://github.com/spatie/laravel-health) ^1.39
+- [typesense/typesense-php](https://github.com/typesense/typesense-php) ^6.0
 
 ## Installation
-
-You can install the package via composer:
 
 ```bash
 composer require illuma-law/healthcheck-typesense
 ```
 
-You can publish the config file with:
+Optionally publish the configuration file:
 
 ```bash
 php artisan vendor:publish --tag="healthcheck-typesense-config"
@@ -34,77 +30,114 @@ php artisan vendor:publish --tag="healthcheck-typesense-config"
 
 ## Configuration
 
-The configuration file allows you to define default client settings and timeout thresholds:
+The published config file (`config/healthcheck-typesense.php`) contains two sections:
 
 ```php
 return [
+    // Connection settings passed to the Typesense PHP client.
     'client_settings' => [
-        'api_key' => env('TYPESENSE_API_KEY', 'xyz'),
-        'nodes'   => [
+        'api_key' => env('TYPESENSE_API_KEY', ''),
+        'nodes' => [
             [
                 'host'     => env('TYPESENSE_HOST', 'localhost'),
                 'port'     => env('TYPESENSE_PORT', '8108'),
                 'protocol' => env('TYPESENSE_PROTOCOL', 'http'),
             ],
         ],
+        'connection_timeout_seconds' => (int) env('TYPESENSE_CONNECTION_TIMEOUT_SECONDS', 2),
     ],
+
+    // Slow-response threshold in seconds.
     'timeout_seconds' => 5,
-    'expected_nodes' => 1,
 ];
 ```
 
+All settings can be overridden at runtime via the fluent API.
+
 ## Usage
 
-### Registration
+### Basic Registration
 
-Register the check in your `HealthServiceProvider` or wherever you configure Spatie Health:
+Register the check wherever you configure Spatie Health (typically in a service provider):
 
 ```php
 use IllumaLaw\HealthCheckTypesense\TypesenseCheck;
 use Spatie\Health\Facades\Health;
 
 Health::checks([
-    TypesenseCheck::new()
-        ->timeout(3)
-        ->expectNodes(1),
+    TypesenseCheck::new(),
 ]);
 ```
 
 ### Fluent API
 
-You can also fluently configure the client settings directly on the check, overriding the default configuration:
+Override config values on a per-check basis:
 
 ```php
 TypesenseCheck::new()
     ->clientSettings([
-        'api_key' => 'custom-key',
-        'nodes' => [['host' => 'typesense.example.com', 'port' => '443', 'protocol' => 'https']]
+        'api_key' => 'my-key',
+        'nodes'   => [['host' => 'typesense.example.com', 'port' => '443', 'protocol' => 'https']],
     ])
-    ->timeout(5)
-    ->expectNodes(3);
+    ->timeout(3);
 ```
 
-### Metadata
+| Method | Description |
+|---|---|
+| `clientSettings(array $settings)` | Override the Typesense client connection settings. |
+| `timeout(int $seconds)` | Set the slow-response warning threshold. |
+| `useClient(Client $client)` | Inject a pre-configured `Typesense\Client` instance (useful for testing). |
 
-The check provides detailed metadata in the result:
+### Result Metadata
 
-- `health`: Raw health status from Typesense.
-- `collection_count`: Number of collections in the cluster.
-- `num_documents_total`: Total number of documents across all collections.
-- `host`: The primary host being checked.
-- `response_time_ms`: Time taken to retrieve health information.
+A successful check includes the following metadata:
+
+| Key | Type | Description |
+|---|---|---|
+| `health` | `array` | Raw health payload from the Typesense `/health` endpoint. |
+| `response_time_ms` | `int` | Round-trip time to the health endpoint in milliseconds. |
+
+### Result Statuses
+
+| Status | Condition |
+|---|---|
+| **OK** | Typesense responded within the timeout threshold. |
+| **Warning** | Typesense responded, but slower than the threshold. |
+| **Failed** | Typesense was unreachable or threw an error. |
 
 ## Testing
 
-The package includes a comprehensive test suite using Pest, with 100% code coverage.
+The package ships with a Pest test suite at 100% code coverage.
 
 ```bash
 composer test
 ```
 
+Run with coverage:
+
+```bash
+composer test-coverage
+```
+
+Run static analysis (PHPStan level 9):
+
+```bash
+composer analyse
+```
+
+Fix code style:
+
+```bash
+composer format
+```
+
 ## Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
+
+## Security
+
+If you discover a security vulnerability, please send an e-mail to [support@illuma.law](mailto:support@illuma.law). All security vulnerabilities will be promptly addressed.
 
 ## Credits
 

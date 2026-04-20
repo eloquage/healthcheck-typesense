@@ -17,8 +17,6 @@ final class TypesenseCheck extends Check
 
     private ?int $timeoutSeconds = null;
 
-    private ?int $expectedNodes = null;
-
     private ?Client $client = null;
 
     public function useClient(Client $client): self
@@ -43,13 +41,6 @@ final class TypesenseCheck extends Check
         return $this;
     }
 
-    public function expectNodes(int $count): self
-    {
-        $this->expectedNodes = $count;
-
-        return $this;
-    }
-
     public function run(): Result
     {
         $configTimeout = config('healthcheck-typesense.timeout_seconds');
@@ -59,59 +50,57 @@ final class TypesenseCheck extends Check
         /** @var array<string, mixed> $clientSettings */
         $clientSettings = $this->clientSettings ?? (is_array($configSettings) ? $configSettings : []);
 
-        $configNodes = config('healthcheck-typesense.expected_nodes');
-        $expectedNodes = $this->expectedNodes ?? (is_int($configNodes) ? $configNodes : 1);
-
         $started = microtime(true);
 
         try {
-            $client = $this->client ?? new Client($clientSettings);
+            $client = $this->resolveClient($clientSettings);
+
+            /** @var array{ok: bool} $health */
             $health = $client->health->retrieve();
-            /** @var array<int, array<string, mixed>> $collections */
-            $collections = $client->collections->retrieve();
         } catch (TypesenseClientError $e) {
-            $message = __('healthcheck-typesense::messages.unreachable', ['message' => $e->getMessage()]);
-
-            return Result::make()
-                ->failed(is_string($message) ? $message : 'Typesense request failed')
-                ->shortSummary('Failed');
+            return $this->failedResult($e->getMessage());
         } catch (Throwable $e) {
-            $message = __('healthcheck-typesense::messages.unreachable', ['message' => $e->getMessage()]);
-
-            return Result::make()
-                ->failed(is_string($message) ? $message : 'Typesense request failed')
-                ->shortSummary('Failed');
+            return $this->failedResult($e->getMessage());
         }
 
         $responseTimeMs = (int) round((microtime(true) - $started) * 1000);
-        $collectionCount = count($collections);
-        $numDocs = 0;
-
-        foreach ($collections as $row) {
-            $numDocs += is_int($row['num_documents'] ?? null) ? (int) $row['num_documents'] : 0;
-        }
-
-        /** @var array<int, array<string, mixed>> $nodes */
-        $nodes = is_array($clientSettings['nodes'] ?? null) ? $clientSettings['nodes'] : [];
-        $node = $nodes[0] ?? [];
-        $host = is_string($node['host'] ?? null) ? (string) $node['host'] : '';
 
         $result = Result::make()
             ->meta([
                 'health' => $health,
-                'collection_count' => $collectionCount,
-                'num_documents_total' => $numDocs,
-                'host' => $host,
                 'response_time_ms' => $responseTimeMs,
             ])
             ->shortSummary("{$responseTimeMs}ms");
 
         if ($responseTimeMs > ($timeoutSeconds * 1000)) {
-            return $result->warning("Typesense responded slowly ({$responseTimeMs}ms)");
+            $message = __('healthcheck-typesense::messages.slow', ['ms' => $responseTimeMs]);
+
+            return $result->warning(is_string($message) ? $message : "Typesense responded slowly ({$responseTimeMs}ms)");
         }
 
         $okMessage = __('healthcheck-typesense::messages.ok');
 
         return $result->ok(is_string($okMessage) ? $okMessage : 'Typesense is healthy');
+    }
+
+    private function resolveClient(mixed $clientSettings): Client
+    {
+        if ($this->client instanceof Client) {
+            return $this->client;
+        }
+
+        /** @var array<string, mixed> $settings */
+        $settings = is_array($clientSettings) ? $clientSettings : [];
+
+        return new Client($settings);
+    }
+
+    private function failedResult(string $errorMessage): Result
+    {
+        $message = __('healthcheck-typesense::messages.unreachable', ['message' => $errorMessage]);
+
+        return Result::make()
+            ->failed(is_string($message) ? $message : 'Typesense request failed')
+            ->shortSummary('Failed');
     }
 }

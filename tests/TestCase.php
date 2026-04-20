@@ -10,16 +10,12 @@ use Spatie\Health\HealthServiceProvider;
 
 class TestCase extends Orchestra
 {
+    /** @return array<int, class-string> */
     protected function getPackageProviders($app): array
     {
         return [
             HealthServiceProvider::class,
             HealthCheckTypesenseServiceProvider::class,
         ];
-    }
-
-    protected function getEnvironmentSetUp($app): void
-    {
-        config()->set('scout.driver', 'typesense');
     }
 }

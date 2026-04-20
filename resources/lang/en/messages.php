@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 return [
-    'check_label' => 'Typesense',
-    'ok' => 'Typesense is healthy and collections are readable.',
+    'ok' => 'Typesense is healthy.',
+    'slow' => 'Typesense responded slowly (:ms ms).',
     'unreachable' => 'Typesense request failed: :message',
 ];

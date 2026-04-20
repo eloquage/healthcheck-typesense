@@ -1,10 +1,11 @@
 {
     "name": "illuma-law/healthcheck-typesense",
-    "description": "Focused Typesense health check for Spatie's Laravel Health package.",
+    "description": "A Typesense health check for Spatie's Laravel Health package.",
     "keywords": [
         "illuma-law",
         "laravel",
         "health",
+        "healthcheck",
         "typesense"
     ],
     "homepage": "https://github.com/illuma-law/healthcheck-typesense",
@@ -18,17 +19,17 @@
     ],
     "require": {
         "php": "^8.3",
-        "spatie/laravel-package-tools": "^1.16",
+        "illuminate/contracts": "^11.0 || ^12.0 || ^13.0",
+        "illuminate/support": "^11.0 || ^12.0 || ^13.0",
         "spatie/laravel-health": "^1.39",
-        "typesense/typesense-php": "^6.0",
-        "illuminate/contracts": "^11.0||^12.0||^13.0",
-        "illuminate/support": "^11.0||^12.0||^13.0"
+        "spatie/laravel-package-tools": "^1.16",
+        "typesense/typesense-php": "^6.0"
     },
     "require-dev": {
+        "larastan/larastan": "^3.0",
         "laravel/pint": "^1.14",
         "nunomaduro/collision": "^8.8",
-        "larastan/larastan": "^3.0",
-        "orchestra/testbench": "^11.1.0",
+        "orchestra/testbench": "^10.0 || ^11.0",
         "pestphp/pest": "^4.0",
         "pestphp/pest-plugin-arch": "^4.0",
         "pestphp/pest-plugin-laravel": "^4.0",
@@ -59,8 +60,7 @@
         "sort-packages": true,
         "allow-plugins": {
             "pestphp/pest-plugin": true,
-            "phpstan/extension-installer": true,
-            "php-http/discovery": true
+            "phpstan/extension-installer": true
         }
     },
     "extra": {
