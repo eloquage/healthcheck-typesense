@@ -106,7 +106,7 @@ it('falls back to default timeout when config value is not an integer', function
 it('uses config client_settings when none provided via fluent api', function () {
     config()->set('healthcheck-typesense.client_settings', [
         'api_key' => 'test-key',
-        'nodes'   => [['host' => 'localhost', 'port' => '8108', 'protocol' => 'http']],
+        'nodes' => [['host' => 'localhost', 'port' => '8108', 'protocol' => 'http']],
     ]);
 
     $client = mockTypesenseClient();
@@ -144,8 +144,8 @@ it('accepts client settings via fluent method', function () {
 
 it('creates a client from settings when no client is injected', function () {
     config()->set('healthcheck-typesense.client_settings', [
-        'api_key'                    => 'xyz',
-        'nodes'                      => [['host' => '127.0.0.1', 'port' => '19999', 'protocol' => 'http']],
+        'api_key' => 'xyz',
+        'nodes' => [['host' => '127.0.0.1', 'port' => '19999', 'protocol' => 'http']],
         'connection_timeout_seconds' => 1,
     ]);
 
@@ -167,10 +167,10 @@ it('can connect to a real typesense instance', function () {
     $result = TypesenseCheck::new()
         ->clientSettings([
             'api_key' => $apiKey,
-            'nodes'   => [
+            'nodes' => [
                 [
-                    'host'     => $host,
-                    'port'     => (string) $port,
+                    'host' => $host,
+                    'port' => (string) $port,
                     'protocol' => $protocol,
                 ],
             ],
