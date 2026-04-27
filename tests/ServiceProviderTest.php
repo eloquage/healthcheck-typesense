@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\File;
 
 it('publishes the config file under the correct tag', function () {
     $this->artisan('vendor:publish', [
-        '--tag' => 'healthcheck-typesense-config',
+        '--tag'   => 'healthcheck-typesense-config',
         '--force' => true,
     ])->assertExitCode(0);
 

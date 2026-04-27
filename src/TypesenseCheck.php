@@ -67,7 +67,7 @@ final class TypesenseCheck extends Check
 
         $result = Result::make()
             ->meta([
-                'health' => $health,
+                'health'           => $health,
                 'response_time_ms' => $responseTimeMs,
             ])
             ->shortSummary("{$responseTimeMs}ms");
