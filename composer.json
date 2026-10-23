@@ -8,7 +8,7 @@
         "healthcheck",
         "typesense"
     ],
-    "homepage": "https://github.com/illuma-law/healthcheck-typesense",
+    "homepage": "https://github.com/eloquage/healthcheck-typesense",
     "license": "MIT",
     "authors": [
         {

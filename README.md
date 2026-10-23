@@ -1,6 +1,6 @@
 # Healthcheck Typesense for Laravel
 
-[![Tests](https://github.com/illuma-law/healthcheck-typesense/actions/workflows/run-tests.yml/badge.svg)](https://github.com/illuma-law/healthcheck-typesense/actions)
+[![Tests](https://github.com/eloquage/healthcheck-typesense/actions/workflows/run-tests.yml/badge.svg)](https://github.com/eloquage/healthcheck-typesense/actions)
 [![Packagist License](https://img.shields.io/badge/Licence-MIT-blue)](http://choosealicense.com/licenses/mit/)
 [![Latest Stable Version](https://img.shields.io/packagist/v/illuma-law/healthcheck-typesense?label=Version)](https://packagist.org/packages/illuma-law/healthcheck-typesense)
 
