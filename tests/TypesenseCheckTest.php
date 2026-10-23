@@ -155,10 +155,15 @@ it('creates a client from settings when no client is injected', function () {
 });
 
 it('can connect to a real typesense instance', function () {
-    $host = env('TYPESENSE_HOST');
-    $port = env('TYPESENSE_PORT');
-    $protocol = env('TYPESENSE_PROTOCOL', 'http');
-    $apiKey = env('TYPESENSE_API_KEY');
+    $host = getenv('TYPESENSE_HOST');
+    $port = getenv('TYPESENSE_PORT');
+    $protocol = getenv('TYPESENSE_PROTOCOL');
+    $apiKey = getenv('TYPESENSE_API_KEY');
+
+    $host = is_string($host) && $host !== '' ? $host : null;
+    $port = is_string($port) && $port !== '' ? $port : null;
+    $protocol = is_string($protocol) && $protocol !== '' ? $protocol : 'http';
+    $apiKey = is_string($apiKey) && $apiKey !== '' ? $apiKey : null;
 
     if (! $host || ! $port || ! $apiKey) {
         $this->markTestSkipped('Typesense environment variables not set.');
