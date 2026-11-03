@@ -1,4 +1,4 @@
-# illuma-law/healthcheck-typesense
+# eloquage/healthcheck-typesense
 
 Typesense health check for Spatie's Laravel Health package. Verifies reachability and latency.
 
