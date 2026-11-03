@@ -1,5 +1,5 @@
 {
-    "name": "illuma-law/healthcheck-typesense",
+    "name": "eloquage/healthcheck-typesense",
     "description": "A Typesense health check for Spatie's Laravel Health package.",
     "keywords": [
         "illuma-law",

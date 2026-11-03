@@ -6,8 +6,8 @@ A [Spatie Laravel Health](https://spatie.be/docs/laravel-health) check that
 calls Typesense’s `/health` endpoint and reports reachability and response time.
 
 [![Tests](https://github.com/eloquage/healthcheck-typesense/actions/workflows/run-tests.yml/badge.svg)](https://github.com/eloquage/healthcheck-typesense/actions/workflows/run-tests.yml)
-[![Latest Version](https://img.shields.io/packagist/v/illuma-law/healthcheck-typesense)](https://packagist.org/packages/illuma-law/healthcheck-typesense)
-[![License](https://img.shields.io/packagist/l/illuma-law/healthcheck-typesense)](LICENSE.md)
+[![Latest Version](https://img.shields.io/packagist/v/eloquage/healthcheck-typesense)](https://packagist.org/packages/eloquage/healthcheck-typesense)
+[![License](https://img.shields.io/packagist/l/eloquage/healthcheck-typesense)](LICENSE.md)
 
 ## Requirements
 
@@ -18,7 +18,7 @@ calls Typesense’s `/health` endpoint and reports reachability and response tim
 ## Install and configure
 
 ```bash
-composer require illuma-law/healthcheck-typesense
+composer require eloquage/healthcheck-typesense
 php artisan vendor:publish --tag=healthcheck-typesense-config
 ```
 
